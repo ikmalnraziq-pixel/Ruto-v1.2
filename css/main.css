@@ -413,7 +413,7 @@
   .login__cta { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .5rem; }
   .login__bento { @media (min-width: 768px) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-  .tabs { display: flex; gap: .25rem; padding: 0 1.5rem .75rem; overflow-x: auto; scrollbar-width: none;
+  .tabs { display: flex; flex-wrap: wrap; gap: .25rem; padding: 0 1.5rem .75rem;
     button { padding: .5rem 1rem; border-radius: 999px; font-size: .875rem; color: var(--fg-2); white-space: nowrap; transition: background-color .5s var(--ease), color .5s var(--ease); }
     button[aria-selected="true"] { background: var(--btn-bg); color: var(--btn-fg); }
   }
@@ -427,6 +427,7 @@
   }
   .row--danger { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--danger) 26%, transparent); }
   .row--empty { color: var(--fg-3); justify-content: center; }
+  .acc-card .row__main { flex: 1; min-width: 0; display: grid; gap: .25rem; }
   .acc-card { display: flex; gap: 1rem; align-items: center; padding: 1.25rem; .avatar { width: 3rem; height: 3rem; } }
   .acc-card + .muted { margin-top: .75rem; }
   .btn-row { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
