@@ -589,7 +589,7 @@ const io = new IntersectionObserver((entries) => entries.forEach((e) => { if (e.
 function wire() {
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-act]'); if (el && A[el.dataset.act]) { e.preventDefault(); A[el.dataset.act](el); return; }
-    const mi = e.target.closest('[data-menu]');
+    const mi = e.target.closest('[data-menu]:not(body)');
     if (mi) {
       const k = mi.dataset.menu;
       if (k === 'new') newChat(); else if (k === 'models') openSettings('models'); else if (k === 'account') openSettings('account'); else if (k === 'settings') openSettings('general');
