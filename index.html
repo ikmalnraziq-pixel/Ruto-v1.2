@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ruto AI — Chat dengan API key sendiri</title>
+  <meta name="description" content="Ruto AI: chatbot BYOK tanpa server. Pakai API key sendiri, data tetap milikmu.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#050505">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; frame-src https://accounts.google.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap">
+  <script src="js/theme-init.js"></script>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body data-sidebar="closed" data-menu="closed">
+  <a class="skip" href="#composerInput" data-i18n="skip">Lewati ke kolom chat</a>
+  <div class="ambient" aria-hidden="true"></div>
+
+  <!-- Fluid Island: navbar kaca melayang -->
+  <header class="island" id="island">
+    <button class="icon-btn island__side" id="btnSidebar" type="button" aria-controls="sidebar" aria-expanded="false" data-i18n-attr="aria-label:history"><i data-icon="sidebar"></i></button>
+    <button class="model-chip" id="modelChip" type="button" popovertarget="modelPop" aria-haspopup="true">
+      <span class="model-chip__dot" aria-hidden="true"></span>
+      <span class="model-chip__label" id="modelChipLabel">—</span>
+      <i data-icon="chevronDown"></i>
+    </button>
+    <button class="sync sync--inline" data-sync type="button"></button>
+    <button class="burger icon-btn" id="btnMenu" type="button" aria-expanded="false" aria-controls="menu" data-i18n-attr="aria-label:menu"><span></span><span></span></button>
+  </header>
+  <button class="sync sync--corner" data-sync type="button"></button>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar" data-i18n-attr="aria-label:history">
+      <div class="bezel sidebar__shell"><div class="core sidebar__core">
+        <div class="sidebar__head">
+          <a class="brand" href="./"><span class="brand__mark"><i data-icon="sparkle"></i></span><span>Ruto AI</span></a>
+          <button class="icon-btn sidebar__close" id="btnSidebarClose" type="button" data-i18n-attr="aria-label:close"><i data-icon="x"></i></button>
+        </div>
+        <button class="btn btn--primary btn--block" id="btnNew" type="button"><span data-i18n="newChat">Chat baru</span><span class="btn__icon"><i data-icon="plus"></i></span></button>
+        <search class="search"><i data-icon="search"></i><input class="search__input" id="searchInput" type="search" autocomplete="off" data-i18n-attr="placeholder:search;aria-label:searchLabel"></search>
+        <nav class="convs" id="convList" data-i18n-attr="aria-label:history"></nav>
+        <div class="sidebar__foot"><button class="account" id="btnAccount" type="button"></button></div>
+      </div></div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <main class="chat" id="main">
+      <div class="stage">
+        <section class="welcome" id="welcome" aria-labelledby="welcomeTitle"></section>
+        <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+      </div>
+      <form class="composer" id="composer" autocomplete="off">
+        <div class="stage">
+          <div class="bezel composer__shell"><div class="core composer__core">
+            <div class="attach-row" id="attachRow" hidden></div>
+            <textarea class="composer__input" id="composerInput" rows="1" enterkeyhint="send" data-i18n-attr="placeholder:composerPh;aria-label:composerLabel"></textarea>
+            <div class="composer__bar">
+              <button class="icon-btn" id="btnAttach" type="button" data-i18n-attr="aria-label:attach"><i data-icon="paperclip"></i></button>
+              <input id="fileInput" type="file" multiple hidden accept="image/*,application/pdf,text/*,.md,.json,.csv,.js,.ts,.jsx,.tsx,.py,.html,.css,.xml,.yml,.yaml,.log,.sql,.sh">
+              <span class="composer__model" id="composerModel"></span>
+              <button class="send" id="btnSend" type="submit" data-mode="send" data-i18n-attr="aria-label:send"><span class="send__core"><i data-icon="arrowUp"></i></span></button>
+            </div>
+          </div></div>
+          <p class="composer__note" data-i18n="composerNote">Jawaban AI bisa keliru. Periksa kembali info penting.</p>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <!-- Overlay menu layar penuh -->
+  <nav class="menu" id="menu" inert data-i18n-attr="aria-label:menu">
+    <div class="menu__inner">
+      <ul class="menu__list">
+        <li><button type="button" data-menu="new"><span class="menu__idx">01</span><span class="mask"><span class="mask__in" data-i18n="newChat">Chat baru</span></span></button></li>
+        <li><button type="button" data-menu="models"><span class="menu__idx">02</span><span class="mask"><span class="mask__in" data-i18n="menuModels">Model & API key</span></span></button></li>
+        <li><button type="button" data-menu="account"><span class="menu__idx">03</span><span class="mask"><span class="mask__in" data-i18n="menuAccount">Akun & sinkronisasi</span></span></button></li>
+        <li><button type="button" data-menu="settings"><span class="menu__idx">04</span><span class="mask"><span class="mask__in" data-i18n="menuSettings">Pengaturan</span></span></button></li>
+        <li><button type="button" data-menu="theme"><span class="menu__idx">05</span><span class="mask"><span class="mask__in" id="menuThemeLabel"></span></span></button></li>
+        <li><button type="button" data-menu="lang"><span class="menu__idx">06</span><span class="mask"><span class="mask__in" id="menuLangLabel"></span></span></button></li>
+      </ul>
+      <p class="menu__foot" data-i18n="menuFoot">Tanpa server.</p>
+    </div>
+  </nav>
+
+  <div class="pop" id="modelPop" popover></div>
+
+  <!-- Login -->
+  <dialog class="sheet sheet--wide" id="dlgLogin" aria-labelledby="loginTitle">
+    <div class="bezel"><div class="core login">
+      <button class="icon-btn sheet__x" type="button" data-close id="loginClose" hidden data-i18n-attr="aria-label:close"><i data-icon="x"></i></button>
+      <div class="login__hero reveal">
+        <span class="eyebrow" data-i18n="eyebrowByok">BYOK</span>
+        <h2 class="display" id="loginTitle" data-i18n="loginTitle"></h2>
+        <p class="lead" data-i18n="loginLead"></p>
+        <div class="login__cta">
+          <button class="btn btn--primary" type="button" data-act="login-google"><span data-i18n="loginGoogle">Masuk dengan Google</span><span class="btn__icon"><i data-icon="arrowUpRight"></i></span></button>
+          <button class="btn btn--ghost" type="button" data-act="login-guest"><span data-i18n="loginGuest">Lanjut sebagai Tamu</span><span class="btn__icon"><i data-icon="arrowUpRight"></i></span></button>
+        </div>
+        <div class="seg login__lang" role="group" aria-label="Language">
+          <button type="button" data-lang="id">Bahasa Indonesia</button><button type="button" data-lang="en">English</button>
+        </div>
+      </div>
+      <div class="bento login__bento">
+        <article class="bezel reveal"><div class="core card"><i data-icon="shield"></i><h3 data-i18n="loginNoServerTitle"></h3><p data-i18n="loginNoServerText"></p></div></article>
+        <article class="bezel reveal"><div class="core card"><i data-icon="lock"></i><h3 data-i18n="loginEncTitle"></h3><p data-i18n="loginEncText"></p></div></article>
+        <article class="bezel reveal"><div class="core card"><i data-icon="cloud"></i><h3 data-i18n="loginDriveTitle"></h3><p data-i18n="loginDriveText"></p></div></article>
+      </div>
+    </div></div>
+  </dialog>
+
+  <!-- Pengaturan -->
+  <dialog class="sheet sheet--wide" id="dlgSettings" aria-labelledby="setTitle">
+    <div class="bezel"><div class="core sheet__core">
+      <header class="sheet__head">
+        <h2 id="setTitle" data-i18n="settings">Pengaturan</h2>
+        <button class="icon-btn" type="button" data-close data-i18n-attr="aria-label:close"><i data-icon="x"></i></button>
+      </header>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="models" id="tab-models" aria-controls="panel-models" data-i18n="tabModels"></button>
+        <button type="button" role="tab" data-tab="account" id="tab-account" aria-controls="panel-account" data-i18n="tabAccount"></button>
+        <button type="button" role="tab" data-tab="general" id="tab-general" aria-controls="panel-general" data-i18n="tabGeneral"></button>
+        <button type="button" role="tab" data-tab="data" id="tab-data" aria-controls="panel-data" data-i18n="tabData"></button>
+      </div>
+      <div class="sheet__body">
+        <section role="tabpanel" id="panel-models" aria-labelledby="tab-models" data-panel="models"></section>
+        <section role="tabpanel" id="panel-account" aria-labelledby="tab-account" data-panel="account" hidden></section>
+        <section role="tabpanel" id="panel-general" aria-labelledby="tab-general" data-panel="general" hidden>
+          <div class="group"><h3 class="group__t" data-i18n="themeTitle"></h3>
+            <div class="seg" role="group"><button type="button" data-theme-set="auto" data-i18n="themeAuto"></button><button type="button" data-theme-set="light" data-i18n="themeLight"></button><button type="button" data-theme-set="dark" data-i18n="themeDark"></button></div></div>
+          <div class="group"><h3 class="group__t" data-i18n="langTitle"></h3>
+            <div class="seg" role="group"><button type="button" data-lang="id">Bahasa Indonesia</button><button type="button" data-lang="en">English</button></div></div>
+        </section>
+        <section role="tabpanel" id="panel-data" aria-labelledby="tab-data" data-panel="data" hidden>
+          <ul class="rows plain">
+            <li class="row"><div class="row__main"><strong data-i18n="dataExport"></strong><span class="muted" data-i18n="dataExportHint"></span></div><button class="btn btn--ghost btn--sm" type="button" data-act="export"><span data-i18n="dataExport"></span><span class="btn__icon"><i data-icon="download"></i></span></button></li>
+            <li class="row"><div class="row__main"><strong data-i18n="dataImport"></strong><span class="muted" data-i18n="dataImportHint"></span></div><button class="btn btn--ghost btn--sm" type="button" data-act="import"><span data-i18n="dataImport"></span><span class="btn__icon"><i data-icon="upload"></i></span></button><input type="file" id="importInput" accept="application/json,.json" hidden></li>
+            <li class="row"><div class="row__main"><strong data-i18n="dataLock"></strong><span class="muted" data-i18n="dataLockHint"></span></div><button class="btn btn--ghost btn--sm" type="button" data-act="lock"><span data-i18n="dataLock"></span><span class="btn__icon"><i data-icon="lock"></i></span></button></li>
+            <li class="row row--danger"><div class="row__main"><strong data-i18n="dataWipe"></strong><span class="muted" data-i18n="dataWipeHint"></span></div><button class="btn btn--danger btn--sm" type="button" data-act="wipe"><span data-i18n="dataWipe"></span><span class="btn__icon"><i data-icon="trash"></i></span></button></li>
+          </ul>
+        </section>
+      </div>
+    </div></div>
+  </dialog>
+
+  <!-- Form model / API key -->
+  <dialog class="sheet" id="dlgModel" aria-labelledby="mTitle">
+    <div class="bezel"><form class="core sheet__core" id="modelForm" novalidate>
+      <header class="sheet__head">
+        <h2 id="mTitle"></h2>
+        <button class="icon-btn" type="button" data-close data-i18n-attr="aria-label:close"><i data-icon="x"></i></button>
+      </header>
+      <div class="sheet__body">
+        <div class="field" id="mKeySourceWrap"><label class="label" for="mKeySel" data-i18n="mKeySource"></label>
+          <div class="select"><select class="input" id="mKeySel"></select><i data-icon="chevronDown"></i></div></div>
+        <div id="mNewKey" class="stack">
+          <div class="field"><label class="label" for="mProvider" data-i18n="mProvider"></label>
+            <div class="select"><select class="input" id="mProvider"></select><i data-icon="chevronDown"></i></div></div>
+          <div class="field" id="mBaseWrap"><label class="label" for="mBase" data-i18n="mBase"></label>
+            <input class="input" id="mBase" type="url" inputmode="url" autocomplete="off" spellcheck="false" data-i18n-attr="placeholder:mBasePh"></div>
+          <div class="field"><label class="label" for="mKey" data-i18n="mKey"></label>
+            <div class="pw"><input class="input" id="mKey" type="password" autocomplete="off" spellcheck="false" autocapitalize="off"><button class="icon-btn" type="button" id="mKeyEye" data-i18n-attr="aria-label:mKeyShow"><i data-icon="eye"></i></button></div></div>
+        </div>
+        <div id="mModelFields" class="stack">
+          <div class="field"><label class="label" for="mName" data-i18n="mName"></label><input class="input" id="mName" type="text" autocomplete="off" maxlength="60" data-i18n-attr="placeholder:mNamePh"></div>
+          <div class="field"><label class="label" for="mModelId" data-i18n="mModelId"></label><input class="input mono" id="mModelId" type="text" list="modelIds" autocomplete="off" spellcheck="false" autocapitalize="off"><datalist id="modelIds"></datalist></div>
+          <details class="adv"><summary data-i18n="mAdvanced"></summary>
+            <div class="field"><label class="label" for="mSystem" data-i18n="mSystem"></label><textarea class="input" id="mSystem" rows="3" data-i18n-attr="placeholder:mSystemPh"></textarea></div></details>
+        </div>
+        <p class="test-msg" id="mTestMsg" role="status"></p>
+        <p class="form-err" id="mErr" role="alert"></p>
+      </div>
+      <footer class="sheet__foot">
+        <button class="btn btn--ghost" type="button" id="mTest"><span data-i18n="mTest"></span><span class="btn__icon"><i data-icon="refresh"></i></span></button>
+        <button class="btn btn--primary" type="submit"><span data-i18n="save"></span><span class="btn__icon"><i data-icon="check"></i></span></button>
+      </footer>
+    </form></div>
+  </dialog>
+
+  <!-- PIN -->
+  <dialog class="sheet sheet--narrow" id="dlgPin" aria-labelledby="pinTitle">
+    <div class="bezel"><form class="core sheet__core" id="pinForm" novalidate>
+      <header class="sheet__head"><h2 id="pinTitle"></h2><button class="icon-btn" type="button" data-close data-i18n-attr="aria-label:close"><i data-icon="x"></i></button></header>
+      <div class="sheet__body">
+        <p class="muted" id="pinText"></p>
+        <div class="field"><label class="label" for="pinInput" data-i18n="pinLabel"></label><input class="input" id="pinInput" type="password" autocomplete="off" spellcheck="false"></div>
+        <div class="field" id="pinConfirmWrap"><label class="label" for="pinConfirm" data-i18n="pinConfirm"></label><input class="input" id="pinConfirm" type="password" autocomplete="off" spellcheck="false"></div>
+        <p class="form-err" id="pinErr" role="alert"></p>
+      </div>
+      <footer class="sheet__foot"><button class="btn btn--primary" type="submit"><span id="pinOk"></span><span class="btn__icon"><i data-icon="arrowUpRight"></i></span></button></footer>
+    </form></div>
+  </dialog>
+
+  <!-- Konfirmasi / prompt generik -->
+  <dialog class="sheet sheet--narrow" id="dlgConfirm" aria-labelledby="cfTitle">
+    <div class="bezel"><form class="core sheet__core" id="cfForm" novalidate>
+      <header class="sheet__head"><h2 id="cfTitle"></h2></header>
+      <div class="sheet__body">
+        <p class="muted" id="cfText"></p>
+        <div class="field" id="cfInputWrap"><input class="input" id="cfInput" type="text" autocomplete="off" aria-labelledby="cfTitle"></div>
+      </div>
+      <footer class="sheet__foot">
+        <button class="btn btn--ghost" type="button" id="cfCancel"><span data-i18n="cancel"></span><span class="btn__icon"><i data-icon="x"></i></span></button>
+        <button class="btn btn--primary" type="submit" id="cfOk"><span id="cfOkLabel"></span><span class="btn__icon"><i data-icon="check"></i></span></button>
+      </footer>
+    </form></div>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
