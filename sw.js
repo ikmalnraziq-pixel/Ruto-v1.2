@@ -1,5 +1,5 @@
 // Service Worker: app shell offline. Panggilan API (AI & Google) tidak pernah di-cache.
-const VER = 'ruto-ai-v1';
+const VER = 'ruto-ai-v2';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/main.css', 'icons/icon.svg',
   'js/main.js', 'js/config.js', 'js/util.js', 'js/icons.js', 'js/i18n.js', 'js/md.js', 'js/db.js',
