@@ -2,7 +2,7 @@
 // Isi GOOGLE_CLIENT_ID dengan OAuth 2.0 Client ID (tipe "Web application") dari Google Cloud Console.
 // Tambahkan origin tempat app di-hosting ke "Authorized JavaScript origins".
 export const CONFIG = {
-  GOOGLE_CLIENT_ID: '',
+  GOOGLE_CLIENT_ID: '515719669122-dak879idj84g566dj9n2vr7q5s1oijh9.apps.googleusercontent.com',
   // Scope minimal sesuai PRD: appdata (folder tersembunyi app) + file (hanya file buatan Ruto AI).
   GOOGLE_SCOPES: [
     'openid', 'profile', 'email',
